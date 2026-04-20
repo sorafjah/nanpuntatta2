@@ -1,3 +1,4 @@
+```html
 <!DOCTYPE html>
 <html lang="ja">
 <head>
@@ -110,10 +111,11 @@
             </div>
 
             <div>
-                <label class="block font-bold mb-2">1時間を超えるか</label>
-                <div class="flex gap-4">
-                    <label class="inline-flex items-center"><input type="radio" name="overHour" value="no" checked> <span class="ml-2">超えない</span></label>
-                    <label class="inline-flex items-center"><input type="radio" name="overHour" value="yes"> <span class="ml-2">超える</span></label>
+                <label class="block font-bold mb-2">時間の幅</label>
+                <div class="flex flex-wrap gap-4">
+                    <label class="inline-flex items-center"><input type="radio" name="timeRange" value="5" checked> <span class="ml-2">5分前後まで</span></label>
+                    <label class="inline-flex items-center"><input type="radio" name="timeRange" value="15"> <span class="ml-2">15分前後まで</span></label>
+                    <label class="inline-flex items-center"><input type="radio" name="timeRange" value="30"> <span class="ml-2">30分前後まで</span></label>
                 </div>
             </div>
 
@@ -275,14 +277,14 @@
         function generateDataAndRender() {
             const qCountEl = document.querySelector('input[name="qCount"]:checked');
             const stepEl = document.querySelector('input[name="step"]:checked');
-            const overHourEl = document.querySelector('input[name="overHour"]:checked');
+            const timeRangeEl = document.querySelector('input[name="timeRange"]:checked');
             const directionEl = document.querySelector('input[name="direction"]:checked');
 
-            if (!qCountEl || !stepEl || !overHourEl || !directionEl) return;
+            if (!qCountEl || !stepEl || !timeRangeEl || !directionEl) return;
 
             const qCount = parseInt(qCountEl.value);
             const step = parseInt(stepEl.value);
-            const overHour = overHourEl.value === 'yes';
+            const timeRange = parseInt(timeRangeEl.value);
             const direction = directionEl.value;
 
             currentQuestionsData = [];
@@ -291,23 +293,14 @@
                 let diff;
                 
                 // 差分の時間（経過時間）を決める
-                if (overHour) {
-                    if (step === 1) {
-                        diff = Math.floor(Math.random() * 120) + 61; 
-                    } else if (step === 5) {
-                        diff = (Math.floor(Math.random() * 24) + 13) * 5; 
-                    } else {
-                        diff = (Math.floor(Math.random() * 12) + 7) * 10; 
-                    }
-                } else {
-                    if (step === 1) {
-                        diff = Math.floor(Math.random() * 58) + 2; 
-                    } else if (step === 5) {
-                        diff = (Math.floor(Math.random() * 11) + 1) * 5; 
-                    } else {
-                        diff = (Math.floor(Math.random() * 5) + 1) * 10; 
-                    }
-                }
+                // timeRange（最大時間）の範囲内で、stepごとのランダムな値を選ぶ
+                let maxStepCount = Math.floor(timeRange / step);
+                // 例：10分きざみで「5分まで」が選ばれた場合などのための補正（最低でも1回分のstepをとる）
+                if (maxStepCount < 1) maxStepCount = 1; 
+
+                // 1 から maxStepCount までのランダムな整数
+                let randomStepCount = Math.floor(Math.random() * maxStepCount) + 1;
+                diff = randomStepCount * step;
 
                 // 前か後かを決める
                 let isAfter;
@@ -486,3 +479,5 @@
     </script>
 </body>
 </html>
+
+```
