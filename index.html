@@ -40,10 +40,6 @@
             grid-template-columns: 1fr;
             gap: 40px;
         }
-        .q-text {
-            line-height: 1.6;
-            font-size: 1.25rem;
-        }
         .answer-line {
             border-bottom: 1px solid black;
             display: inline-block;
@@ -356,7 +352,7 @@
 
             currentQuestionsData.forEach(q => {
                 const qDiv = document.createElement('div');
-                qDiv.className = 'p-4 flex flex-col items-start relative border-b border-gray-200 border-dashed last:border-0 pb-6';
+                qDiv.className = 'p-4 flex flex-col items-start border-b border-gray-200 border-dashed last:border-0 pb-6';
                 
                 const timeAText = formatTime(q.timeA.h, q.timeA.m);
                 const diffText = formatDuration(q.diff);
@@ -364,27 +360,33 @@
 
                 // --- 問題文と画像の組み立て ---
                 let contentHTML = '';
+                const textClasses = "text-lg editable whitespace-nowrap";
 
                 if (display === 'text') {
                     contentHTML = `
-                        <div class="q-text text-[1.35rem] font-bold mb-3 editable" contenteditable="true">
-                            ${timeAText}の、${diffText}${directionText}は何時何分でしょう？
+                        <div class="flex items-center mb-3 w-full">
+                            <div class="text-lg editable mr-2 flex-shrink-0" contenteditable="true">(${q.id})</div>
+                            <div class="${textClasses}" contenteditable="true">
+                                ${timeAText}の、${diffText}${directionText}は何時何分でしょう？
+                            </div>
                         </div>
                     `;
                 } else if (display === 'both') {
                     contentHTML = `
-                        <div class="flex items-center gap-6 mb-3 w-full">
-                            <div class="w-[120px] h-[120px] flex-shrink-0">${createClockSVG(q.timeA.h, q.timeA.m)}</div>
-                            <div class="q-text text-[1.35rem] font-bold editable" contenteditable="true">
+                        <div class="flex items-center gap-4 mb-3 w-full">
+                            <div class="text-lg editable flex-shrink-0" contenteditable="true">(${q.id})</div>
+                            <div class="w-[110px] h-[110px] flex-shrink-0">${createClockSVG(q.timeA.h, q.timeA.m)}</div>
+                            <div class="${textClasses}" contenteditable="true">
                                 ${timeAText}の、${diffText}${directionText}は何時何分でしょう？
                             </div>
                         </div>
                     `;
                 } else if (display === 'clock') {
                     contentHTML = `
-                        <div class="flex items-center gap-6 mb-3 w-full">
-                            <div class="w-[120px] h-[120px] flex-shrink-0">${createClockSVG(q.timeA.h, q.timeA.m)}</div>
-                            <div class="q-text text-[1.35rem] font-bold editable" contenteditable="true">
+                        <div class="flex items-center gap-4 mb-3 w-full">
+                            <div class="text-lg editable flex-shrink-0" contenteditable="true">(${q.id})</div>
+                            <div class="w-[110px] h-[110px] flex-shrink-0">${createClockSVG(q.timeA.h, q.timeA.m)}</div>
+                            <div class="${textClasses}" contenteditable="true">
                                 この時刻の、${diffText}${directionText}は何時何分でしょう？
                             </div>
                         </div>
@@ -393,10 +395,12 @@
 
                 // --- 解答エリア ---
                 let answerArea = '';
+                const answerAreaClasses = "mt-4 w-full pl-8"; // 番号の幅分くらいインデント
+
                 if (format === 'write') {
                     answerArea = `
-                        <div class="mt-4 text-xl w-full flex items-end">
-                            <span class="editable font-bold" contenteditable="true">答え：</span>
+                        <div class="${answerAreaClasses} text-lg flex items-end">
+                            <span class="editable" contenteditable="true">答え：</span>
                             <span class="answer-line"></span>
                         </div>`;
                 } else if (format === 'choice2') {
@@ -412,7 +416,7 @@
                     });
                     
                     answerArea = `
-                        <div class="mt-4 grid grid-cols-2 gap-4 text-lg w-full font-medium">
+                        <div class="${answerAreaClasses} grid grid-cols-2 gap-4 text-lg font-medium">
                             ${choicesHTML}
                         </div>`;
                 } else {
@@ -424,13 +428,12 @@
                     });
                     
                     answerArea = `
-                        <div class="mt-4 grid grid-cols-4 gap-4 text-lg w-full font-medium">
+                        <div class="${answerAreaClasses} grid grid-cols-4 gap-4 text-lg font-medium">
                             ${choicesHTML}
                         </div>`;
                 }
 
                 qDiv.innerHTML = `
-                    <div class="absolute top-2 -left-4 text-lg font-bold editable" contenteditable="true">(${q.id})</div>
                     ${contentHTML}
                     ${answerArea}
                 `;
