@@ -8,15 +8,24 @@
     <style>
         @media print {
             .no-print { display: none !important; }
-            body { background-color: white !important; padding: 0 !important; }
+            html, body {
+                background-color: white !important;
+                padding: 0 !important;
+                margin: 0 !important;
+                height: auto !important;
+                overflow: hidden !important;
+            }
             .print-page {
-                width: 210mm;
-                min-height: 297mm;
-                padding: 15mm;
-                margin: 0;
-                box-sizing: border-box;
+                width: auto !important;
+                min-height: 0 !important;
+                height: auto !important;
+                padding: 15mm 10mm !important;
+                margin: 0 !important;
+                box-sizing: border-box !important;
                 border: none !important;
                 box-shadow: none !important;
+                page-break-after: avoid !important;
+                overflow: visible !important;
             }
             /* 印刷時は編集枠を消す */
             .editable { 
@@ -291,17 +300,12 @@
             for (let i = 0; i < qCount; i++) {
                 let diff;
                 
-                // 差分の時間（経過時間）を決める
-                // timeRange（最大時間）の範囲内で、stepごとのランダムな値を選ぶ
                 let maxStepCount = Math.floor(timeRange / step);
-                // 例：10分きざみで「5分まで」が選ばれた場合などのための補正（最低でも1回分のstepをとる）
                 if (maxStepCount < 1) maxStepCount = 1; 
 
-                // 1 から maxStepCount までのランダムな整数
                 let randomStepCount = Math.floor(Math.random() * maxStepCount) + 1;
                 diff = randomStepCount * step;
 
-                // 前か後かを決める
                 let isAfter;
                 if (direction === 'mixed') {
                     isAfter = Math.random() > 0.5;
@@ -309,15 +313,12 @@
                     isAfter = (direction === 'after');
                 }
 
-                // 開始時刻(timeA)をランダムに決定
                 let startTotalMinutes = Math.floor(Math.random() * (12 * 60 / step)) * step;
                 let timeA = minToTime(startTotalMinutes);
 
-                // 答えの時刻(timeB)を計算
                 let endTotalMinutes = startTotalMinutes + (isAfter ? diff : -diff);
                 let timeB = minToTime(endTotalMinutes);
 
-                // 選択肢の生成
                 const choices = generateTimeChoices(timeB);
 
                 currentQuestionsData.push({
@@ -350,7 +351,6 @@
                 const diffText = formatDuration(q.diff);
                 const directionText = q.isAfter ? '後' : '前';
 
-                // --- 問題文と画像の組み立て ---
                 let contentHTML = '';
                 const textClasses = "text-lg editable whitespace-nowrap";
 
@@ -385,9 +385,8 @@
                     `;
                 }
 
-                // --- 解答エリア ---
                 let answerArea = '';
-                const answerAreaClasses = "mt-4 w-full pl-8"; // 番号の幅分くらいインデント
+                const answerAreaClasses = "mt-4 w-full pl-8";
 
                 if (format === 'write') {
                     answerArea = `
@@ -396,7 +395,6 @@
                             <span class="answer-line"></span>
                         </div>`;
                 } else if (format === 'choice2') {
-                    // 2択式：正解と不正解を1つずつ抽出してシャッフル
                     const correctStr = formatTime(q.timeB.h, q.timeB.m);
                     const wrongChoice = q.choices.find(c => c !== correctStr);
                     const choicesForRender = [correctStr, wrongChoice].sort(() => Math.random() - 0.5);
@@ -412,7 +410,6 @@
                             ${choicesHTML}
                         </div>`;
                 } else {
-                    // 4択式
                     const labels = ['ア', 'イ', 'ウ', 'エ'];
                     let choicesHTML = '';
                     q.choices.forEach((choice, index) => {
@@ -435,7 +432,6 @@
 
         // HTMLを保存する機能
         function saveHTML() {
-            // 現在のラジオボタンの選択状態をHTMLの属性に反映する
             document.querySelectorAll('input[type="radio"]').forEach(radio => {
                 if (radio.checked) {
                     radio.setAttribute('checked', 'checked');
@@ -444,10 +440,8 @@
                 }
             });
 
-            // 現在のHTML全体を取得
             const htmlContent = '<!DOCTYPE html>\n' + document.documentElement.outerHTML;
             
-            // Blobを作成してダウンロードリンクを生成
             const blob = new Blob([htmlContent], { type: 'text/html; charset=utf-8' });
             const url = URL.createObjectURL(blob);
             
@@ -455,11 +449,9 @@
             a.href = url;
             a.download = '時刻を求めるプリント.html';
             
-            // クリックしてダウンロードを実行
             document.body.appendChild(a);
             a.click();
             
-            // クリーンアップ
             document.body.removeChild(a);
             URL.revokeObjectURL(url);
         }
