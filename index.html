@@ -6,6 +6,10 @@
     <title>時刻を求めるプリント</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
+        @page {
+            size: A4 portrait;
+            margin: 10mm;
+        }
         @media print {
             .no-print { display: none !important; }
             html, body {
@@ -19,7 +23,7 @@
                 width: auto !important;
                 min-height: 0 !important;
                 height: auto !important;
-                padding: 15mm 10mm !important;
+                padding: 2mm 4mm !important;
                 margin: 0 !important;
                 box-sizing: border-box !important;
                 border: none !important;
@@ -47,7 +51,11 @@
         .question-grid {
             display: grid;
             grid-template-columns: 1fr;
-            gap: 40px;
+            gap: 20px;
+        }
+        .question-item {
+            break-inside: avoid;
+            page-break-inside: avoid;
         }
         .answer-line {
             border-bottom: 1px solid black;
@@ -172,7 +180,7 @@
 
     <!-- プリント本体 -->
     <div id="print-area" class="print-page">
-        <div class="flex justify-between items-end mb-8">
+        <div class="flex justify-between items-end mb-4">
             <div class="text-right w-full">
                 <div class="text-lg">なまえ：____________________________________</div>
             </div>
@@ -345,7 +353,7 @@
 
             currentQuestionsData.forEach(q => {
                 const qDiv = document.createElement('div');
-                qDiv.className = 'p-4 flex flex-col items-start border-b border-gray-200 border-dashed last:border-0 pb-6';
+                qDiv.className = 'question-item px-4 pt-2 pb-5 flex flex-col items-start border-b border-gray-200 border-dashed last:border-0';
                 
                 const timeAText = formatTime(q.timeA.h, q.timeA.m);
                 const diffText = formatDuration(q.diff);
@@ -386,7 +394,7 @@
                 }
 
                 let answerArea = '';
-                const answerAreaClasses = "mt-4 w-full pl-8";
+                const answerAreaClasses = "mt-2 w-full pl-8";
 
                 if (format === 'write') {
                     answerArea = `
